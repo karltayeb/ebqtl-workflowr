@@ -1,0 +1,65 @@
+---
+title: Run Scran
+date: "2022-02-01"
+output: workflowr::wflow_html
+params:
+    adata_path: '../ebQTL/resources/EB_high_pass_basic_filtering.h5ad'
+    subsample: TRUE
+    rds_path: 'output/proc/EB_high_pass_normalized.Rds'
+---
+
+```{r}
+library(reticulate)
+reticulate::use_condaenv('/scratch/midway2/ktayeb/.conda/envs/scvi-scanpy-gpu')
+reticulate::py_config()
+```
+
+```{r make_sce}
+library(SingleCellExperiment)
+sc <- import('scanpy')
+adata <- sc$read_h5ad(params$adata_path) 
+
+if(params$subsample){
+    sc$pp$subsample(adata, 0.1)
+}
+sce <- SingleCellExperiment(
+    assays      = list(counts = t(adata$X)),
+    colData     = adata$obs,
+    rowData     = adata$var
+)
+```
+
+```{r run_scran}
+library(scran)
+library(tictoc)
+tic('running scran')
+tic('clustering with quickCluster')
+clusters <- quickCluster(sce)
+sce$normalization_clusters <- clusters
+toc()
+tic('computing size factors')
+sce <- computeSumFactors(sce, clusters=clusters)
+toc()
+toc()
+summary(sizeFactors(sce))
+saveRDS(sce, params$rds_path)
+```
+
+Record runtimes for varying sizes
+
+```{r}
+scran_wflow <- function(sce){
+    require(scran)
+    require(tictoc)
+    tic('running scran')
+    tic('clustering with quickCluster')
+    clusters <- quickCluster(sce)
+    sce$normalization_clusters <- clusters
+    toc()
+    tic('computing size factors')
+    sce <- computeSumFactors(sce, clusters=clusters)
+    toc()
+    toc()
+}
+```
+

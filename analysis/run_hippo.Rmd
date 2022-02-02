@@ -1,0 +1,18 @@
+```{r}
+library(HIPPO)
+library(rmote)
+rmote::start_rmote()
+graphics.off()
+```
+
+```{r}
+data(toydata)
+data(ensg_hgnc)
+head(toydata)
+library(ggplot2)
+library(SingleCellExperiment)
+ggplot(as.data.fram(colData(toydata)), aes(x=libsize.drop, y=feature.drop)) + geom_point()
+hippo_diagnostic_plot(toydata, show_outliers = TRUE, zvalue_thresh = 2)
+```
+
+
