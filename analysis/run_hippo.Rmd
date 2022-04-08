@@ -1,18 +1,44 @@
-```{r}
-library(HIPPO)
-library(rmote)
-rmote::start_rmote()
-graphics.off()
-```
+---
+title: Run HIPPO
+date: "2022-02-07"
+output: workflowr::wflow_html
+params:
+    adata_path: 'output/proc/EB_high_pass_filtered.Rmd'
+    hippo_path: 'output/proc/EB_high_pass_hippo_clusters.Rds'
+    hippo_K: 1000
+---
 
-```{r}
-data(toydata)
-data(ensg_hgnc)
-head(toydata)
-library(ggplot2)
+Make HIPPO diagnostic plot. Broadly we should see an overabundance of 0s at any given mean count frequency since the cell population is super heterogeneous.
+
+```{r load_sce}
+library(zellkonverter)
 library(SingleCellExperiment)
-ggplot(as.data.fram(colData(toydata)), aes(x=libsize.drop, y=feature.drop)) + geom_point()
-hippo_diagnostic_plot(toydata, show_outliers = TRUE, zvalue_thresh = 2)
+sce <- readH5AD(
+    "output/proc/EB_high_pass_filtered_subsample.h5ad",
+    verbose = TRUE,
+    use_hdf5 = FALSE
+)
+
+counts(sce) <- assay(sce, "X")
+hippo_diagnostic_plot(sce, show_outliers = TRUE)
 ```
 
+
+```{r run_hippo}
+library(HIPPO)
+sce <- hippo(
+  sce,
+  K = 1000, #  params$hippo_K,
+  z_threshold = 2,
+  outlier_proportion = 0.00001
+)
+saveRDS(sce@int_metadata$hippo, 'hippo.Rds')
+```
+
+```{r plots}
+n <- length(sce_mini@int_metadata$hippo$features)
+k <- seq(from=1, to=n, by=as.integer(n/12))
+k <- k + (n - max(k))
+zero_proportion_plot(sce_mini, k=k)
+```
 

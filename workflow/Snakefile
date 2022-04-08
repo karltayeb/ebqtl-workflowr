@@ -1,0 +1,8 @@
+configfile: "config/config.yml"
+include: "rules/process.smk"
+include: "rules/celltype_assignment.smk"
+include: "rules/staticqtl.smk"
+
+rule none:
+    input: 'workflow/Snakefile'
+    run: print("ebQTL-workflow")

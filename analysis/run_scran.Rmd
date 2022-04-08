@@ -3,15 +3,21 @@ title: Run Scran
 date: "2022-02-01"
 output: workflowr::wflow_html
 params:
-    adata_path: '../ebQTL/resources/EB_high_pass_basic_filtering.h5ad'
-    subsample: TRUE
+    adata_path: '../ebQTL/resources/EB_high_pass_basic_filtered_subsample.h5ad'
+    subsample: FALSE
     rds_path: 'output/proc/EB_high_pass_normalized.Rds'
 ---
+
+Convert AnnData -> SingleCellExperiment
+Cluster the data using `quickClust` and use those clusters to compute size factors with `scran`
+These are compute heavy steps so they're isolated to this notebook, exploration may be done downstream.
 
 ```{r}
 library(reticulate)
 reticulate::use_condaenv('/scratch/midway2/ktayeb/.conda/envs/scvi-scanpy-gpu')
 reticulate::py_config()
+
+print(params)
 ```
 
 ```{r make_sce}
@@ -43,23 +49,5 @@ toc()
 toc()
 summary(sizeFactors(sce))
 saveRDS(sce, params$rds_path)
-```
-
-Record runtimes for varying sizes
-
-```{r}
-scran_wflow <- function(sce){
-    require(scran)
-    require(tictoc)
-    tic('running scran')
-    tic('clustering with quickCluster')
-    clusters <- quickCluster(sce)
-    sce$normalization_clusters <- clusters
-    toc()
-    tic('computing size factors')
-    sce <- computeSumFactors(sce, clusters=clusters)
-    toc()
-    toc()
-}
 ```
 

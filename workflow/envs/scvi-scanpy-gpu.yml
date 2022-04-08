@@ -1,0 +1,25 @@
+name: scvi-scanpy-gpu
+channels:
+  - conda-forge
+  - bioconda
+  - pytorch
+dependencies:
+  - python=3.9.7
+  - pytorch
+  - torchvision
+  - torchaudio
+  - cudatoolkit=10.2
+  - pip
+  - ipykernel
+  - seaborn
+  - scikit-learn
+  - scikit-misc
+  - statsmodels
+  - numba
+  - pytables
+  - python-igraph
+  - leidenalg
+  - scvi-tools
+  - seaborn
+  - pip:
+    - scanpy

@@ -1,0 +1,19 @@
+name: scarches
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python
+  - pip
+  - ipykernel
+  - seaborn
+  - scikit-learn
+  - statsmodels
+  - numba
+  - pytables
+  - python-igraph
+  - leidenalg
+  - scvi-tools
+  - pip:
+    - scarches
+    - scanpy
