@@ -1,6 +1,7 @@
 # ebqtl 
 
-Most of the code you'll want is under `workflow/code`
+This repo is a mashup of a workflowr site and a Snakemake workflow. 
+All of the code you'll want is under `workflow/`
 
 
 ## Normalization with `scran`
