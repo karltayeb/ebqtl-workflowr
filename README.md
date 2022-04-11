@@ -6,6 +6,18 @@ All of the code you'll want is under `workflow/`
 
 ## Normalization with `scran`
 
+Scran performs normalization by estimating size factors of many overlapping pseudocell samples (sum of counts across multiple cells) **within a cluster of relatively homogeneous cells**, and then deconvolving them into cell level estimates. The pseudocells have lower proportion of zero counts, which is important for the stability of the size factor estimation  procedures typical in RNA-seq.
+
+That said, the main bottleneck for scran on data this large is computing the clustering. `scran` ships with a heirarchecal clustering strategy that is feasible on the order of ~10k-100k cells.
+
+What I did was cluster the raw counts (really the top PCs of the raw counts) to get a rough clustering of the data. Then, I fed each of these rough clusters to scrans clustering (assuming that the default parameters are tailored to the needs of `scran` for size factor estimation). The final clustering is in `output/scran/clusters.txt` which should have ALL cells and clusters like `{kmeans_cluster}_{scran_heirarchecal_cluster}`. 
+
+Then, we run scran on ALL cells with this clutering. The size factors are saved in `output/scran/final.txt`
+
+### Key outputs:
+* `output/scran/final.txt` a file with the size factors and cluster ID for each cell. `scran` deconvolution was run within each cluster and then across cluster normalization was applied as described in the scran paper.
+
+
 ## CellId
 
 ### Pipeline
